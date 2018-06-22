@@ -4,16 +4,16 @@
         td.skill-cell
             input(type="text" 
              v-model="newSkillPercent" 
-             @change="changeSkillPercent(skill.id)"
+             @change="changeSkillPercent(skill._id)"
              :class="{error: validation.hasError('newSkillPercent')}"
              ).input.skill-input
         td.skill-cell %
         td.skill-cell
             div.error-message {{validation.firstError('newSkillPercent')}}
-        td.skill-cell
+        td.skill-cell.skill-remove
             appButton(
                 name="Удалить"
-                @click.native="removeSkill(skill.id)")
+                @click.native="removeSkill(skill)")
                           
 </template>
 <script>
@@ -35,14 +35,14 @@ export default {
         skill: Object
     },
     methods:{
-       removeSkill(id){
-           console.log("wtf");
-           this.$emit('removeSkill', id);
-       },
-       changeSkillPercent(id){
-           let params={id, percent: this.newSkillPercent};
-           this.$emit('changeSkillPercent', params);
-       } 
+        removeSkill(skill){
+            console.log("wtf");
+            this.$emit('removeSkill', skill);
+        },
+        changeSkillPercent(id){
+            let params={id, percent: this.newSkillPercent};
+            this.$emit('changeSkillPercent', params);
+        } 
     },
     components:{
         appButton: require('../../button'),

@@ -2,15 +2,17 @@
   .about
     h1.title Страница "Обо мне"
     .about-content
-        .skills-list(v-for="(skillType, index) in skillsTypes")
+        .skills-list(v-for="(skillType, index) in skills")
             skills-list(
-                :skills="skills" 
-                :skillType="skillType"
+                :skills="skillType.skills" 
+                :skillTypeData="skillType"
                 :key="index",
                 @addSkill ="addSkill", 
                 @removeSkill ="removeSkill",
+                @removeSkillGroup="removeSkillGroup"
                 @changeSkillPercent="changeSkillPercent", 
             ) 
+    appButton(name="Добавить группу" @click.native="addSkill(skillType)")        
 
 
 </template>
@@ -21,7 +23,7 @@ import {mapActions, mapGetters, mapMutations} from 'vuex';
 export default {
     data(){
         return{
-            skillsTypes: ['Frontend', 'Backend', 'Workflow']
+            
         }
     },
     computed:{
@@ -31,13 +33,16 @@ export default {
         this.fetchSkills();
     },
     methods: {
-        ...mapActions(['fetchSkills']),
-        ...mapMutations(['addNewSkill', 'removeSavedSkill', 'changePercentData']),
+        ...mapActions(['fetchSkills', 'addNewSkill', 'removeSavedSkill', 'removeSavedSkillGroup']),
+        ...mapMutations(['changePercentData']),
         addSkill(skill){
            this.addNewSkill(skill);
         },
-        removeSkill(id){
-            this.removeSavedSkill(id);
+        removeSkill(skill){
+            this.removeSavedSkill(skill);
+        },
+        removeSkillGroup(id){
+            this.removeSavedSkillGroup(id);
         },
         changeSkillPercent(params){
             params.percent = parseInt(params.percent)
@@ -45,7 +50,8 @@ export default {
         }
     },
     components: {
-        skillsList: require('./skills-list')
+        skillsList: require('./skills-list'),
+        appButton: require('../button')
     }
 }
 </script>
