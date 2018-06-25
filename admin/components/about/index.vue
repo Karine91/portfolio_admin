@@ -4,26 +4,46 @@
     .about-content
         .skills-list(v-for="(skillType, index) in skills")
             skills-list(
-                :skills="skillType.skills" 
                 :skillTypeData="skillType"
                 :key="index",
                 @addSkill ="addSkill", 
                 @removeSkill ="removeSkill",
-                @removeSkillGroup="removeSkillGroup"
+                @removeSkillGroup="removeSkillGroup",
+                @editSkillGroupName="editSkillGroupName"
                 @changeSkillPercent="changeSkillPercent", 
-            ) 
-    appButton(name="Добавить группу" @click.native="addSkill(skillType)")        
+            )
+    table.buttons-add-group
+        tr
+            td.add-name-title Название
+            td.add-name-input 
+                input(
+                    type="text" 
+                    v-model="newSkillGroup" 
+                    :class="{error: validation.hasError('newSkillGroup')}"
+                ).input.input-skill-type-name
+        tr
+            td(colspan="2")
+                div.error-message {{validation.firstError('newSkillGroup')}}      
+        tr
+            td(colspan="2")         
+                appButton.add-group-btn(name="Добавить группу" @click.native="addSkillGroup")        
 
 
 </template>
 <script>
 
 import {mapActions, mapGetters, mapMutations} from 'vuex';
-
+import {Validator} from 'simple-vue-validator';
 export default {
+    mixins: [require('simple-vue-validator').mixin],
     data(){
         return{
-            
+            newSkillGroup: ''
+        }
+    },
+    validators:{
+        'newSkillGroup'(value){
+            return Validator.value(value).required('Название не может быть пустым!');
         }
     },
     computed:{
@@ -33,20 +53,32 @@ export default {
         this.fetchSkills();
     },
     methods: {
-        ...mapActions(['fetchSkills', 'addNewSkill', 'removeSavedSkill', 'removeSavedSkillGroup']),
-        ...mapMutations(['changePercentData']),
+        ...mapActions(['fetchSkills', 'addNewSkill', 'addNewSkillGroup', 'removeSavedSkill', 'removeSavedSkillGroup', 'editSavedSkillGroupName', 'editSkill']),
         addSkill(skill){
            this.addNewSkill(skill);
         },
         removeSkill(skill){
             this.removeSavedSkill(skill);
         },
+        addSkillGroup(){          
+            this.$validate().then(success => {
+                if(!success) return;
+                let data = {
+                    name: this.newSkillGroup
+                } 
+                this.addNewSkillGroup(data);
+                this.newSkillGroup = "";
+                this.validation.reset();
+            });
+        },
+        editSkillGroupName(data){
+            this.editSavedSkillGroupName(data);
+        },
         removeSkillGroup(id){
             this.removeSavedSkillGroup(id);
         },
         changeSkillPercent(params){
-            params.percent = parseInt(params.percent)
-            this.changePercentData(params);
+            this.editSkill(params);
         }
     },
     components: {

@@ -4,7 +4,7 @@
         td.skill-cell
             input(type="text" 
              v-model="newSkillPercent" 
-             @change="changeSkillPercent(skill._id)"
+             @input="changeSkillPercent(skill._id)"
              :class="{error: validation.hasError('newSkillPercent')}"
              ).input.skill-input
         td.skill-cell %
@@ -18,7 +18,7 @@
 </template>
 <script>
 import {Validator} from 'simple-vue-validator';
-
+var debounce = require('debounce');
 export default {
     mixins: [require('simple-vue-validator').mixin],
     data(){
@@ -39,10 +39,13 @@ export default {
             console.log("wtf");
             this.$emit('removeSkill', skill);
         },
-        changeSkillPercent(id){
-            let params={id, percent: this.newSkillPercent};
-            this.$emit('changeSkillPercent', params);
-        } 
+        changeSkillPercent: debounce(function (_id){
+            this.$validate().then(success => {
+                if(!success) return;
+                let params = {skill_id: _id, percents: parseInt(this.newSkillPercent)};
+                this.$emit('changeSkillPercent', params);
+            });
+        }, 1000) 
     },
     components:{
         appButton: require('../../button'),

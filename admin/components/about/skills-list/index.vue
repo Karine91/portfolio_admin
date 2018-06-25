@@ -1,12 +1,19 @@
 <template lang="pug">
     div.skill-type-block
         .skills-type-header
-            .skills-title {{skillTypeData.name}}
+            .skills-title 
+                input(
+                        type="text" 
+                        v-model="skillGroupName"
+                        @input="editSkillGroupName" 
+                        :class="{error: validation.hasError('skillGroupName')}"
+                    ).input.input-skill-name
             .skill-remove
                 appButton(name="Удалить группу" @click.native="removeSkillGroup")
-        table.skill-table
+        div.error-message {{validation.firstError('skillGroupName')}}        
+        table.skill-table(v-if="skillTypeData.skills.length")
             skill-item(
-                v-for="(skill, index) in skills"
+                v-for="(skill, index) in skillTypeData.skills"
                 :key="index"
                 :skill="skill"
                 @removeSkill= "removeSkill"
@@ -42,17 +49,17 @@
 <script>
 
 import {Validator} from 'simple-vue-validator';
-
+var debounce = require('debounce');
 export default {
     props: {
         skillTypeData: Object,
-        skills: Array
     },
     mixins: [require('simple-vue-validator').mixin],
     data() {
         return {
             newSkill: "",
-            newSkillPercent: 0
+            newSkillPercent: 0,
+            skillGroupName: this.skillTypeData.name
         }
     },
     validators:{
@@ -61,6 +68,9 @@ export default {
         },
         'newSkillPercent'(value){
             return Validator.value(value).required('Поле не может быть пустым!').integer('Введите число');
+        },
+        'skillGroupName'(value){
+            return Validator.value(value).required('Название не может быть пустым!');
         }
     },
     methods: {
@@ -71,6 +81,7 @@ export default {
             this.$emit('removeSkillGroup', this.skillTypeData._id);
         },
         changeSkillPercent(params){
+            params.type_id = this.skillTypeData._id;
             this.$emit('changeSkillPercent', params);
         },
         addSkill(){
@@ -80,13 +91,16 @@ export default {
                 this.$emit('addSkill', {
                     name: this.newSkill,
                     percents: this.newSkillPercent,
-                    type: this.skillTypeData.type
+                    type_id:  this.skillTypeData._id
                 });
                 this.newSkill = "";
                 this.newSkillPercent = 0;
                 this.validation.reset();
              });
-        }
+        },
+        editSkillGroupName: debounce(function () {
+            this.$emit('editSkillGroupName', {name: this.skillGroupName, id: this.skillTypeData._id});
+        }, 200)
     },
     components: {
         skillItem: require('../skill-item'),

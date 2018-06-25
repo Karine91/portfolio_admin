@@ -9,6 +9,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "debounce": "^1.1.0",
     "extract-text-webpack-plugin": "^3.0.1",
     "simple-vue-validator": "^0.14.0",
     "svg-fill-loader": "0.0.8",
