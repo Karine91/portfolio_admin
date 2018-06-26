@@ -24,6 +24,12 @@ ul{
     &:hover{
         background-color: darken($green, 10); 
     }
+    &.red{
+        background: $red;
+        &:hover{
+            background: darken($red, 10); 
+        }
+    }
 }
 .button[disabled]{
     background-color: rgba($gray, .2);  

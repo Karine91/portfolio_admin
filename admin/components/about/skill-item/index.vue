@@ -11,7 +11,7 @@
         td.skill-cell
             div.error-message {{validation.firstError('newSkillPercent')}}
         td.skill-cell.skill-remove
-            appButton(
+            appButton.red(
                 name="Удалить"
                 @click.native="removeSkill(skill)")
                           
@@ -36,7 +36,6 @@ export default {
     },
     methods:{
         removeSkill(skill){
-            console.log("wtf");
             this.$emit('removeSkill', skill);
         },
         changeSkillPercent: debounce(function (_id){

@@ -1,24 +1,48 @@
 <template lang='pug'>
-    .works 
-        h1.title Страница "Мои работы"
-        .form
-            .form-title Добавить работу
-            form(name="works")
-                input(type="text" placeholder="Название проекта" v-model="fields.name").input
-                input(type="text" placeholder="Технологии" v-model="fields.tech").input
-                label.upload
-                    input(type="file" @change="getFile($event)").input-file
-                    .upload-icon
-                    .upload__text Загрузить картинку
-                div.error-message {{validation.firstError('fields.file')}}
-        appButton(name="Добавить"
-        :disabled="!fields.file || validation.hasError('fields.file')"
-        @click.native="addWork").button-bottom
+    .works
+        work-form(
+            v-if="!editMode"
+            key="add"
+            ref="addForm"
+            headTitle = 'Страница "Мои работы"',
+            formTitle = 'Добавить работу',
+            btnText = 'Добавить'
+            @saved="addWork"
+        )
+        work-form(
+            v-else
+            key="edit"
+            ref="editForm"
+            :work="editData"
+            headTitle = 'Страница "Мои работы" - Редактирование',
+            formTitle = 'Редактировать работу',
+            btnText = 'Редактировать'
+            @saved="editWork"
+        )
+            appButton.red(@click.native="editMode = false" name="Отмена" slot="buttons")          
+        table.table-works
+            thead
+                th Название проекта
+                th Технологии
+                th Картинка
+                th
+                th
+            tbody
+                tr(v-for="(work, index) in works" :key="index")
+                    td {{ work.name }}
+                    td {{ work.technology }}
+                    td( width="100" height="100" align="center") 
+                        img(:src="$http.options.root + work.picture" alt="" height="100%")
+                    td(width="50") 
+                        appButton(@click.native="editMode = true; editData = work" name="Редактировать") 
+                    td(width="50") 
+                        appButton.red(@click.native="deleteWork(work._id)" name="Удалить")        
+
         
 </template>
 <script>
 import { Validator } from 'simple-vue-validator'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
     mixins: [require('simple-vue-validator').mixin],
@@ -35,32 +59,48 @@ export default {
     },
     data: function() {
         return {
-            fields: {
-                name: '',
-                tech: '',
-                file: null
-            }
+            editMode: false,
+            editData: {}
         }
+    },
+    created(){
+        this.getWorks();
+    },
+    computed: {
+        ...mapGetters(['works'])
     },
     methods: {
-        ...mapActions('works', ['addNewWork']),
-        getFile(event) {
-            const file = event.target.files[0];
-            this.fields.file = file;
+        ...mapActions(['addNewWork', 'editSavedWork', 'getWorks', 'deleteSavedWork']),
+        addWork(fields){
+            let formData = new FormData();
+            formData.append('file', fields.file, fields.file.name);
+            formData.append('tech', fields.tech);
+            formData.append('name', fields.name);
+            this.addNewWork(formData).then(()=> {
+                this.$refs.addForm.clearForm();
+            });
         },
-        addWork() {
-            this.$validate().then(success => {
-                if (!success) return
-                let formData = new FormData();
-                formData.append('file', this.fields.file, this.fields.file.name);
-                formData.append('tech', this.fields.tech);
-                formData.append('name', this.fields.name);
-                this.addNewWork(formData);
-            })
-        }
+        editWork(fields){
+            let formData = new FormData();
+            if(fields.file){
+                formData.append('file', fields.file, fields.file.name);
+            }
+            formData.append('tech', fields.tech);
+            formData.append('name', fields.name);
+            this.editSavedWork({_id: this.editData._id, formData}).then(()=> {
+                this.editData = {};
+                this.editMode = false;
+                this.$refs.editForm.clearForm();
+            });
+        },
+        deleteWork(id){
+            this.deleteSavedWork(id);
+        },
+        
     },
     components:{
-        appButton: require('../button')
+        appButton: require('../button'),
+        workForm: require('./form')
     }
 }
 </script>

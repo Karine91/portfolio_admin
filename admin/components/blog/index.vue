@@ -5,44 +5,62 @@
             .form-title Добавить запись
             form(name="blog")
                 input(type="text" placeholder="Название" v-model="fields.name").input
-                input(type="date" placeholder="Дата" v-model="fields.date").input
-                textarea(type="text" placeholder="Содержание" v-model="fields.text").input.textarea
+                dateInput(v-model="fields.date").input
+                textarea(type="text" placeholder="Содержание" v-model="fields.body").input.textarea
         appButton(name="Добавить" @click.native="addPost").button-bottom
                 
-        .table
+        .table(v-if="posts")
             table.posts
-            tr(v-for="(post, index) in posts")
-                td {{post.name}}
-                td {{post.date}}
-                td {{post.text}}
+                thead
+                    th Название
+                    th Дата
+                    th Описание
+                    th
+                    th
+                tbody
+                    table-post-row(
+                        v-for="(post, index) in posts"
+                        :key="index"
+                        :data="post"
+                        )
+                         
 </template>
 <script>
 
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-
+const moment = require('moment');
 export default {
     data(){
         return {
             fields:{
                 name: "",
-                date: '',
-                text: "",
+                date: moment().format(),
+                body: "",
             }
         }
     },
+    created(){
+        this.getBlogPosts();
+    },
     methods: {
-        ...mapActions(['addBlogPost']),
+        ...mapActions(['addBlogPost', 'getBlogPosts']),
+        timeFormated: function (value){
+            return moment(value).format('YYYY-MM-DD');        
+        },
         addPost(){
            let fieldsData = Object.assign({}, this.fields);
            this.addBlogPost(fieldsData);
-           this.fields = {name: '', date: '', text: ''};
-        }
+           this.fields = {name: '', date: moment().format('YYYY-MM-DD'), body: ''};
+        },
+        
     },
     computed: {
     ...mapGetters(['posts'])
     },
     components:{
-        appButton: require('../button')
+        appButton: require('../button'),
+        dateInput: require('./dateInput'),
+        tablePostRow: require('./postRow')
     }
 }
 </script>

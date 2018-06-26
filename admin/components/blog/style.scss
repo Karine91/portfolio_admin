@@ -20,3 +20,16 @@
     height: 165px;
     max-width: 500px;
 }
+.posts{
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    th {
+        padding: 10px;
+        border: 1px solid #ccc;
+        background: $green;
+        color: #fff;
+        font-family: 'Robobto-Bold', sans-serif;
+    }
+}

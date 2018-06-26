@@ -9,7 +9,7 @@
                         :class="{error: validation.hasError('skillGroupName')}"
                     ).input.input-skill-name
             .skill-remove
-                appButton(name="Удалить группу" @click.native="removeSkillGroup")
+                appButton.red(name="Удалить группу" @click.native="removeSkillGroup")
         div.error-message {{validation.firstError('skillGroupName')}}        
         table.skill-table(v-if="skillTypeData.skills.length")
             skill-item(

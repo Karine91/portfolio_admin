@@ -1,13 +1,53 @@
+import Vue from 'vue';
 const works = {
-    namespaced: true,
     state: {
-        data: {},
+        data: [],
+    },
+    getters: {
+        works(state){
+            return state.data;
+        }
+    },
+    mutations: {
+        setWorks(state, data){
+            state.data = data; 
+        },
+        addNewWork(state, work){
+            state.data.push(work);
+        },
+        editWork(state, work){
+            let item = state.data.findIndex(el => el._id == work._id);
+            Vue.set(state.data, item, work);
+        },
+        deleteWork(state, id){
+            state.data = state.data.filter(elem => elem._id != id);
+        }
     },
     actions: {
-        addNewWork({ state, rootGetters }, fields) {
+        getWorks({commit, rootGetters}){
             const $http = rootGetters.$http;
-            $http.post('/admin/work', fields);
+            return $http.get('api/works').then((res)=> {
+                commit('setWorks', res.body.works);
+            });
         },
+        addNewWork({ commit, rootGetters }, fields) {
+            const $http = rootGetters.$http;
+            return $http.post('api/works', fields).then((res)=> {
+                commit('addNewWork', res.body.item);
+            });
+        },
+        editSavedWork({commit, rootGetters}, data) {
+            const $http = rootGetters.$http;
+            return $http.patch(`api/works/${data._id}`, data.formData).then((res)=> {
+                commit('editWork', res.body.item);
+            });
+        },
+        deleteSavedWork({commit, rootGetters}, id) {
+            const $http = rootGetters.$http;
+            return $http.delete(`api/works/${id}`).then((res)=> {
+                commit('deleteWork', id);
+            });
+        }
     },
 };
 
