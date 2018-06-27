@@ -24,6 +24,7 @@
             thead
                 th Название проекта
                 th Технологии
+                th Ссылка на сайт
                 th Картинка
                 th
                 th
@@ -31,6 +32,8 @@
                 tr(v-for="(work, index) in works" :key="index")
                     td {{ work.name }}
                     td {{ work.technology }}
+                    td 
+                        a(href="work.link" target="_blank") {{ work.link }}
                     td( width="100" height="100" align="center") 
                         img(:src="$http.options.root + work.picture" alt="" height="100%")
                     td(width="50") 
@@ -76,6 +79,7 @@ export default {
             formData.append('file', fields.file, fields.file.name);
             formData.append('tech', fields.tech);
             formData.append('name', fields.name);
+            formData.append('link', fields.link);
             this.addNewWork(formData).then(()=> {
                 this.$refs.addForm.clearForm();
             });
@@ -87,6 +91,7 @@ export default {
             }
             formData.append('tech', fields.tech);
             formData.append('name', fields.name);
+            formData.append('link', fields.link);
             this.editSavedWork({_id: this.editData._id, formData}).then(()=> {
                 this.editData = {};
                 this.editMode = false;

@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
   entry: {
-    entry: './admin/main.js',
+    admin: './admin/main.js',
     styles: './admin/stylesheets/index.js'
 },
   output: {

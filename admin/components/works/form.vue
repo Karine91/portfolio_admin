@@ -6,6 +6,7 @@
             form(name="works" id="worksForm")
                 input(type="text" placeholder="Название проекта" v-model="fields.name").input
                 input(type="text" placeholder="Технологии" v-model="fields.tech").input
+                input(type="text" placeholder="Ссылка на сайт" v-model="fields.link").input
                 label.upload
                     input(type="file" @change="getFile($event)").input-file
                     .upload-icon
@@ -47,6 +48,7 @@ export default {
                 if(value){
                     this.fields.name = value.name;
                     this.fields.tech = value.technology;
+                    this.fields.link = value.link;
                     this.imgPrewPath = this.$http.options.root + value.picture;
                 }
             },
@@ -59,6 +61,7 @@ export default {
             fields: {
                 name: '',
                 tech: '',
+                link: '',
                 file: null
             }
         }
@@ -84,6 +87,7 @@ export default {
         clearForm(){
             this.fields.name = '';
             this.fields.tech = '';
+            this.fields.link = '';
             this.fields.file = null;
             this.imgPrewPath = '';
         }
